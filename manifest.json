@@ -1,0 +1,22 @@
+{
+    "manifest_version": 2,
+    "name": "Compteur Repuls.io",
+    "version": "1.0",
+    "description": "Compte le temps passé sur repuls.io",
+    "icons": {
+      "48": "icons/icon.png"
+    },
+    "permissions": [
+      "tabs",
+      "storage"
+    ],
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+    },
+    "browser_action": {
+      "default_icon": "icone-48.png",
+      "default_popup": "popup.html"
+    }
+  }
+  
