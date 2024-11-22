@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <style>
-    body {
-      width: 200px;
-      padding: 10px;
-      font-family: Arial, sans-serif;
-    }
-  </style>
-</head>
-<body>
-  <h1>Temps sur Repuls.io</h1>
-  <p id="tempsAffiche"></p>
-  <script src="popup.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="pandaroux007"/>
+        <link rel="stylesheet" href="popup.css">
+    </head>
+    <body>
+        <div id="header" title="RepulsTime">
+            <img src="icons/banner.svg" alt="Repuls" id="banner">
+            <h1 id="title">Time</h1>
+        </div>
+        <br>
+        <div>
+            <h3>Vous jouez depuis</h3>
+            <p id="time_since_start"></p>
+        </div>
+        <div>
+            <h3>Il vous reste</h3>
+            <p id="remaining_time"></p>
+        </div>
+        <img src="icons/settings.svg" alt="Paramètres" title="Paramètres" id="settings_button">
+        <!-- load javascript -->
+        <script src="popup.js"></script>
+    </body>
 </html>

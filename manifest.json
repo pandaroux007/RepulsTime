@@ -1,22 +1,27 @@
 {
     "manifest_version": 2,
-    "name": "Compteur Repuls.io",
-    "version": "1.0",
-    "description": "Compte le temps passé sur repuls.io",
+    "name": "RepulsTime",
+    "version": "0.1.0",
+    "description": "Limit time spent on repuls.io",
+    "homepage_url": "https://github.com/pandaroux007/RepulsTime",
     "icons": {
-      "48": "icons/icon.png"
-    },
-    "permissions": [
-      "tabs",
-      "storage"
-    ],
-    "background": {
-      "scripts": ["background.js"],
-      "persistent": false
+        "48": "icons/icon.svg",
+        "96": "icons/icon.svg"
     },
     "browser_action": {
-      "default_icon": "icone-48.png",
-      "default_popup": "popup.html"
+        "default_icon": "icons/icon.svg",
+        "default_title": "RepulsTime",
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "webRequest",
+        "webRequestBlocking",
+        "storage",
+        "tabs",
+        "*://repuls.io/*"
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
     }
-  }
-  
+}
