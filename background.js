@@ -7,6 +7,7 @@ let activeTab = null;
 let currentDate = new Date().toDateString();
 let timeLimits = {};
 
+const LINK_GAME = "repuls.io/"
 const DEFAULT_TIME_LIMITS = {
     monday: 30,
     tuesday: 30,
@@ -23,11 +24,13 @@ const DEFAULT_TIME_LIMITS = {
 function handleURLChange(tab) {
     if(isRootRepulsIo(tab.url)) {
         if(activeTab !== tab.id) {
+            console.log("activeTab is repuls.io!")
             activeTab = tab.id;
             startTimer();
         }
     } else {
         if(activeTab === tab.id) {
+            console.log("activeTab isn't repuls.io")
             stopTimer();
             activeTab = null;
         }
@@ -39,7 +42,8 @@ function getDailyTimeLimit() {
     const currentDay = daysOfWeek[new Date().getDay()]; // get the time limit for the current day
     if(timeLimits[currentDay]) return(timeLimits[currentDay])
     else {
-        if(currentDay === ('sunday' || 'wednesday' || 'saturday')) return(45);
+        if(currentDay === ('wednesday' || 'saturday')) return(45);
+        else if(currentDay === 'sunday') return(0);
         else return(30);
     }
 }
@@ -54,11 +58,11 @@ function isTimeLimitExceeded() {
 }
 
 function isRootRepulsIo(url) {
-    return(url === "https://repuls.io/" || url === "http://repuls.io/");
+    return(url === `https://${LINK_GAME}` || url === `http://${LINK_GAME}`);
 }
 
 function closeRepulsIoTab() {
-    browser.tabs.query({url: "*://repuls.io/"}).then((tabs) => {
+    browser.tabs.query({url: `*://${LINK_GAME}`}).then((tabs) => {
         tabs.forEach((tab) => {
             browser.tabs.remove(tab.id);
         });
@@ -69,12 +73,14 @@ function closeRepulsIoTab() {
 // ----------------------------------------------- Timer
 function startTimer() {
     if(!timerInterval) {
+        console.log("startTimer called now!")
         timerInterval = setInterval(() => {
             timePlayedToday++;
 
-            browser.storage.local.set({ timePlayedToday: timePlayedToday, lastDate: currentDate });
+            browser.storage.local.set({ timePlayedToday: timePlayedToday, lastDate: currentDate, timeRemaining: calculateRemainingTime()});
             
-            if(timePlayedToday >= getDailyTimeLimit() * 60) {
+            if(isTimeLimitExceeded()) {
+                console.log("time exceeded! stopTimer and closeRepulsIoTab will be called!")
                 stopTimer();
                 closeRepulsIoTab();
             }
@@ -84,6 +90,7 @@ function startTimer() {
 
 function stopTimer() {
     if(timerInterval) {
+        console.log("stopTimer called now!")
         clearInterval(timerInterval);
         timerInterval = null;
     }
@@ -101,6 +108,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
     if(activeTab === tabId) {
+        console.log("repuls.io tab closed now!")
         stopTimer();
         activeTab = null;
     }
@@ -110,15 +118,19 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
 browser.storage.local.get(['timePlayedToday', 'lastDate', 'timeLimits']).then((result) => {
     if(result.lastDate === currentDate) {
         timePlayedToday = result.timePlayedToday || 0;
+        console.log("Today is always the last day, the counter will don't set to 0!")
     } else { // new day
         timePlayedToday = 0;
         browser.storage.local.set({ timePlayedToday: 0, lastDate: currentDate });
+        console.log("Today is a new day! The counter will set to 0!")
     }
     
     if(!result.timeLimits) {
+        console.log("timeLimits not found, use DEFAULT_TIME_LIMITS!")
         browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
         timeLimits = DEFAULT_TIME_LIMITS;
     } else {
+        console.log("timeLimits founded, use it.")
         timeLimits = result.timeLimits;
     }
 });
@@ -127,9 +139,10 @@ browser.storage.local.get(['timePlayedToday', 'lastDate', 'timeLimits']).then((r
 browser.webRequest.onBeforeRequest.addListener(
     (details) => {
         if(isTimeLimitExceeded() && isRootRepulsIo(details.url)) {
-            return {redirectUrl: browser.runtime.getURL("blocked.html")};
+            console.log("here is repuls.io tab but time limit is exceeded! redirecting to the \"blocked\" page!")
+            return {redirectUrl: browser.runtime.getURL("blocked/blocked.html")};
         }
     },
-    { urls: ["*://repuls.io/"] },
+    { urls: [`*://${LINK_GAME}`] },
     ["blocking"]
 );

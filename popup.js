@@ -7,8 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayUpdate() {
         browser.storage.local.get('timePlayedToday').then((result) => {
+            // time since start of the game
             const timePlayedToday = result.timePlayedToday || 0;
             document.getElementById('time_since_start').textContent = formatTime(timePlayedToday);
+            // remaining time
+            const timeRemaining = browser.storage.local.get('timeRemaining')
+            document.getElementById('remaining_time').textContent = timeRemaining;
         });
     }
 
@@ -16,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     displayUpdate();
 
     const settingsLink = document.getElementById('settings_button');
-    if (settingsLink) {
+    if(settingsLink) {
         settingsLink.addEventListener('click', () => {
             browser.tabs.create({url: "settings/settings.html"});
         });
