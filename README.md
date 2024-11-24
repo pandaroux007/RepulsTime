@@ -44,3 +44,8 @@ currently being written...
 }
 ```
 - **`timeRemaining`**: Used only by the popup (for display the remaining time) and updated in the `startTimer` function of `background.js`. Contains the remaining time so as not to have to define the `calculateRemainingTime` and `getDailyTimeLimit` functions twice. Probably not optimized and not reliable!
+- **`contentVisible`** : Variable containing the display state of unnecessary elements of the game's main page (suggestion of gameplay video on youtube and link group at the right bottom).
+
+## ToDo list
+- [ ] complete settings management (html, css, javascript...);
+- [ ] finish writing the doc (README.md file);

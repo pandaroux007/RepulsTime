@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,21 +11,21 @@
             <img src="../icons/banner.svg" alt="Repuls" id="banner">
             <h1 id="title">Time</h1>
         </div>
-        <br>
         <div>
-            <h3>Vous jouez depuis</h3>
+            <h3>You play since</h3>
             <p id="time_since_start"></p>
         </div>
         <div>
-            <h3>Il vous reste</h3>
+            <h3>Remaining time</h3>
             <p id="remaining_time"></p>
         </div>
         <div id="footer">
-            <label class="switch">
-                <input type="checkbox" id="toggleFeaturedContent">
+            <label class="switch" title="Show useless elements in root page of the game
+(YouTube suggestions and links at the right bottom)">
+                <input type="checkbox" id="toggleUselessContent">
                 <span class="slider"></span>
             </label>
-            <img src="../icons/settings.svg" alt="Paramètres" title="Paramètres" id="settings_button">
+            <img src="../icons/settings.svg" alt="⚙️" title="Settings" id="settings_button">
         </div>
         <!-- load javascript -->
         <script src="popup.js"></script>

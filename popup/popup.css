@@ -7,6 +7,7 @@ body {
 }
 
 #header, #banner {width: 100%;}
+#header {padding-bottom: 20px;}
 #title {
     position: fixed;
     top: 29px;

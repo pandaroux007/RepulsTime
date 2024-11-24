@@ -23,10 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
         browser.tabs.create({url: "../settings/settings.html"});
     }); */
 
-    document.getElementById('toggleFeaturedContent').addEventListener('change', (event) => {
+    const toggleSwitchUselessContent = document.getElementById('toggleUselessContent');
+    browser.storage.local.get('contentVisible').then((result) => {
+        toggleSwitchUselessContent.checked = result.contentVisible !== false;
+    });
+    
+    toggleSwitchUselessContent.addEventListener('change', (event) => {
         const isChecked = event.target.checked;
+        browser.storage.local.set({ showFeaturedContent: isChecked });
         browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-            browser.tabs.sendMessage(tabs[0].id, { action: "toggleFeaturedContent", visible: isChecked });
+            browser.tabs.sendMessage(tabs[0].id, {
+                action: "toggleUselessContent",
+                visible: isChecked
+            });
         });
     });
 });

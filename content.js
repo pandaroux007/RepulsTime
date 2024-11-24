@@ -25,14 +25,29 @@ function updateTimerDisplay() {
 
 setInterval(updateTimerDisplay, 1000);
 
-// yt video content
-let featuredContentVisible = true;
+// youtube video suggestions window and links group at the right bottom
+let contentVisible = true;
+function updateContentVisibility() {
+    const featuredContent = document.querySelector('#featuredContent');
+    if(featuredContent) {
+        featuredContent.style.display = contentVisible ? 'block' : 'none';
+    }
+
+    const linkAtRightBottom = document.querySelector('#idLinks');
+    if(linkAtRightBottom) {
+        /*linkAtRightBottom.style.display = contentVisible ? 'flex' : 'none';*/
+        linkAtRightBottom.style.cssText = contentVisible ? 'display: flex; flex-direction: column; transform: scale(0.85);' : 'display: none;';
+    }
+}
+
+browser.storage.local.get('contentVisible').then((result) => {
+    contentVisible = result.contentVisible !== false;
+    updateContentVisibility();
+});
+
 browser.runtime.onMessage.addListener((message) => {
-    if(message.action === "toggleFeaturedContent") {
-        const featuredContent = document.querySelector('.featuredContent');
-        if(featuredContent) {
-            featuredContentVisible = message.visible;
-            featuredContent.style.display = featuredContentVisible ? 'block' : 'none';
-        }
+    if(message.action === "toggleUselessContent") {
+        contentVisible = message.visible;
+        updateContentVisibility();
     }
 });

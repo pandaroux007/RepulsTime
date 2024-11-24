@@ -15,7 +15,7 @@ const DEFAULT_TIME_LIMITS = {
     thursday: 30,
     friday: 45,
     saturday: 45,
-    sunday: 0
+    sunday: 30
 };
 
 // ***************************************************************
@@ -138,6 +138,10 @@ browser.storage.local.get(['timePlayedToday', 'lastDate', 'timeLimits']).then((r
     } else {
         console.log("timeLimits founded, use it.");
         timeLimits = result.timeLimits;
+    }
+
+    if (result.contentVisible === undefined) {
+        browser.storage.local.set({ contentVisible: true });
     }
 });
 
