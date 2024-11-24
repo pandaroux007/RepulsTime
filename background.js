@@ -22,15 +22,15 @@ const DEFAULT_TIME_LIMITS = {
 //                          functions
 // ***************************************************************
 function handleURLChange(tab) {
-    if(isRootRepulsIo(tab.url)) {
-        if(activeTab !== tab.id) {
-            console.log("activeTab is repuls.io!")
-            activeTab = tab.id;
-            startTimer();
-        }
+    console.log("handleURLChange called with URL:", tab.url);
+    if (isRootRepulsIo(tab.url)) {
+        console.log("activeTab is repuls.io root page!");
+        activeTab = tab.id;
+        startTimer();
     } else {
-        if(activeTab === tab.id) {
-            console.log("activeTab isn't repuls.io")
+        console.log("URL is not repuls.io");
+        if (activeTab !== null) {
+            console.log("stopping timer for previous repuls.io tab");
             stopTimer();
             activeTab = null;
         }
@@ -73,14 +73,14 @@ function closeRepulsIoTab() {
 // ----------------------------------------------- Timer
 function startTimer() {
     if(!timerInterval) {
-        console.log("startTimer called now!")
+        console.log("startTimer called now!");
         timerInterval = setInterval(() => {
             timePlayedToday++;
 
             browser.storage.local.set({ timePlayedToday: timePlayedToday, lastDate: currentDate, timeRemaining: calculateRemainingTime()});
             
             if(isTimeLimitExceeded()) {
-                console.log("time exceeded! stopTimer and closeRepulsIoTab will be called!")
+                console.log("time exceeded! stopTimer and closeRepulsIoTab will be called!");
                 stopTimer();
                 closeRepulsIoTab();
             }
@@ -90,25 +90,31 @@ function startTimer() {
 
 function stopTimer() {
     if(timerInterval) {
-        console.log("stopTimer called now!")
+        console.log("stopTimer called now!");
         clearInterval(timerInterval);
         timerInterval = null;
     }
 }
 
 // ***************************************************************
-//                          program
+//                          listeners and init
 // ***************************************************************
 // listener for tab changes & tab updates
 browser.tabs.onActivated.addListener((activeInfo) => {
-    browser.tabs.get(activeInfo.tabId).then(handleURLChange);
+    browser.tabs.get(activeInfo.tabId).then((tab) => {
+        handleURLChange(tab);
+    });
 });
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if(changeInfo.status === 'complete') handleURLChange(tab);
+    if(changeInfo.status === 'complete') {
+        console.log("a new tab has been opened or updated!");
+        handleURLChange(tab);
+    }
 });
+//https://developer.mozilla.org/en/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
     if(activeTab === tabId) {
-        console.log("repuls.io tab closed now!")
+        console.log("repuls.io tab closed now!");
         stopTimer();
         activeTab = null;
     }
@@ -118,19 +124,19 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
 browser.storage.local.get(['timePlayedToday', 'lastDate', 'timeLimits']).then((result) => {
     if(result.lastDate === currentDate) {
         timePlayedToday = result.timePlayedToday || 0;
-        console.log("Today is always the last day, the counter will don't set to 0!")
+        console.log("today is always the last day, the counter will don't set to 0!");
     } else { // new day
         timePlayedToday = 0;
         browser.storage.local.set({ timePlayedToday: 0, lastDate: currentDate });
-        console.log("Today is a new day! The counter will set to 0!")
+        console.log("today is a new day! The counter will set to 0!");
     }
     
     if(!result.timeLimits) {
-        console.log("timeLimits not found, use DEFAULT_TIME_LIMITS!")
+        console.log("timeLimits not found, use DEFAULT_TIME_LIMITS!");
         browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
         timeLimits = DEFAULT_TIME_LIMITS;
     } else {
-        console.log("timeLimits founded, use it.")
+        console.log("timeLimits founded, use it.");
         timeLimits = result.timeLimits;
     }
 });
@@ -139,10 +145,11 @@ browser.storage.local.get(['timePlayedToday', 'lastDate', 'timeLimits']).then((r
 browser.webRequest.onBeforeRequest.addListener(
     (details) => {
         if(isTimeLimitExceeded() && isRootRepulsIo(details.url)) {
-            console.log("here is repuls.io tab but time limit is exceeded! redirecting to the \"blocked\" page!")
-            return {redirectUrl: browser.runtime.getURL("blocked/blocked.html")};
+            console.log("here is repuls.io tab but time limit is exceeded! redirecting to the \"blocked\" page!");
+            browser.tabs.update(details.tabId, {url: browser.runtime.getURL("blocked/blocked.html")});
+            return {cancel: true};
         }
     },
-    { urls: [`*://${LINK_GAME}`] },
+    {urls: [`*://${LINK_GAME}`]},
     ["blocking"]
 );

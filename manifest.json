@@ -10,18 +10,24 @@
     },
     "browser_action": {
         "default_icon": "icons/icon.svg",
-        "default_title": "RepulsTime",
-        "default_popup": "popup.html"
+        "default_popup": "popup/popup.html",
+        "default_title": "RepulsTime"
     },
     "permissions": [
         "webRequest",
         "webRequestBlocking",
         "storage",
         "tabs",
-        "*://repuls.io/*"
+        "*://repuls.io/"
     ],
     "background": {
         "scripts": ["background.js"],
         "persistent": false
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://repuls.io/"],
+            "js": ["content.js"]
+        }
+    ]
 }

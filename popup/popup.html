@@ -8,7 +8,7 @@
     </head>
     <body>
         <div id="header" title="RepulsTime">
-            <img src="icons/banner.svg" alt="Repuls" id="banner">
+            <img src="../icons/banner.svg" alt="Repuls" id="banner">
             <h1 id="title">Time</h1>
         </div>
         <br>
@@ -20,7 +20,13 @@
             <h3>Il vous reste</h3>
             <p id="remaining_time"></p>
         </div>
-        <img src="icons/settings.svg" alt="Paramètres" title="Paramètres" id="settings_button">
+        <div id="footer">
+            <label class="switch">
+                <input type="checkbox" id="toggleFeaturedContent">
+                <span class="slider"></span>
+            </label>
+            <img src="../icons/settings.svg" alt="Paramètres" title="Paramètres" id="settings_button">
+        </div>
         <!-- load javascript -->
         <script src="popup.js"></script>
     </body>
