@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.info("POPUP >> popup has been opened!");
+
     function formatTime(seconds) {
         const minutes = Math.floor((seconds % 3600) / 60);
         const secondsRemaining = seconds % 60;
@@ -19,9 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(displayUpdate, 1000);
     displayUpdate();
 
-    /* document.getElementById('settings_button').addEventListener('click', () => {
+    document.getElementById('settings_button').addEventListener('click', () => {
+        console.log("POPUP >> settings button has been clicked! opening settings...");
         browser.tabs.create({url: "../settings/settings.html"});
-    }); */
+    });
 
     const toggleSwitchUselessContent = document.getElementById('toggleUselessContent');
     browser.storage.local.get('contentVisible').then((result) => {
@@ -29,12 +32,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     toggleSwitchUselessContent.addEventListener('change', (event) => {
+        console.log("POPUP >> the state of useless elements button has been changed!");
         const isChecked = event.target.checked;
-        browser.storage.local.set({ showFeaturedContent: isChecked });
+        console.log(`POPUP >> the visibility of useless elements is ${isChecked} now!`);
+        browser.storage.local.set({ contentVisible: isChecked });
         browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
             browser.tabs.sendMessage(tabs[0].id, {
                 action: "toggleUselessContent",
                 visible: isChecked
+            }).catch((error) => {
+                console.info("POPUP >> error for hide useless element (content.js isn't active ?)");
+                console.info("POPUP >> " + error);
             });
         });
     });

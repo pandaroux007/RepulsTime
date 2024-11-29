@@ -1,0 +1,83 @@
+/************************************ main ************************************/
+body {
+    font-family: arial, sans-serif;
+    line-height: 1.6;
+    font-weight: bold;
+    color: #2B2B2B;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #F4F4F4;
+    text-align: center;
+}
+
+.settings_container {
+    background-color: #FFF;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/************************************ widgets ************************************/
+.title {color: #3498DB}
+.danger_title {color: #E74C3C}
+
+button {
+    color: #FFF;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.classic_button {background-color: #3498DB}
+.classic_button:hover {background-color: #2980B9}
+.danger_button {background-color: #E74C3C}
+.danger_button:hover {background-color: #C0392B}
+
+input[type="number"] {border-radius: 4px}
+input[type="password"] {border-radius: 20px}
+input[type="number"], input[type="password"] {
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #DDD;
+}
+#initial_password {min-width: 250px}
+
+/************************************ time limits section ************************************/
+.time_limits, .password_section {margin-bottom: 30px}
+.time_limits {
+    border-bottom: 1px solid #DDD;
+    padding-bottom: 10px;
+}
+
+#time_limits_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+#time_limits_table th,
+#time_limits_table td {
+    border: 1px solid #DDD;
+    padding: 8px;
+    text-align: left;
+}
+
+#time_limits_table th {background-color: #F2F2F2}
+#time_limits_table input[type="number"] {width: 80px}
+
+/************************************ password section ************************************/
+.danger_zone {
+    border-radius: 5px;
+    border: 2px solid #E74C3C;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepulsTime's settings</title>
+    <!-- favicon & title -->
+    <link rel="shortcut icon" type="image/png" href="../icons/icon.svg">
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div class="settings_container">
+        <img src="../icons/banner.svg" alt="RepulsTime">
+        <h1 class="title">RepulsTime's settings</h1>
+        <!-- displayed once at first start-->
+        <div id="password_setup" style="display: none;">
+            <h2 class="title">Initial setup</h2>
+            <p>Please set a parental password :</p>
+            <input type="password" id="initial_password" required>
+            <button class="classic_button" id="set_initial_password">Set password</button>
+        </div>
+        <div id="main_settings" style="display: none;">
+            <div class="time_limits">
+                <h2 class="title">Maximum play time per day</h2>
+                <table id="time_limits_table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Time limit (minutes)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- table rows will be dynamically added here-->
+                    </tbody>
+                </table>
+                <p id="change_time_limits_info" style="display: none;"></p>
+                <button class="classic_button" id="save_limits">Save time limits</button>
+            </div>
+            <div class="danger_zone">
+                <h2 class="danger_title">Critical zone</h2>
+                <div class="password_section">
+                    <p id="change_password_info" style="display: none;"></p>
+
+                    <label for="current_password">Current password :</label>
+                    <input type="password" id="current_password" required>
+
+                    <label for="new_password">New password :</label>
+                    <input type="password" id="new_password" required>
+                    <br>
+                    <button class="danger_button" id="change_password">Change password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--load javascript -->
+    <script src="settings.js"></script>
+</body>
+</html>

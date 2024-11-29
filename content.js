@@ -35,7 +35,6 @@ function updateContentVisibility() {
 
     const linkAtRightBottom = document.querySelector('#idLinks');
     if(linkAtRightBottom) {
-        /*linkAtRightBottom.style.display = contentVisible ? 'flex' : 'none';*/
         linkAtRightBottom.style.cssText = contentVisible ? 'display: flex; flex-direction: column; transform: scale(0.85);' : 'display: none;';
     }
 }
@@ -48,6 +47,7 @@ browser.storage.local.get('contentVisible').then((result) => {
 browser.runtime.onMessage.addListener((message) => {
     if(message.action === "toggleUselessContent") {
         contentVisible = message.visible;
+        console.log("useless elements on root page of repuls.io will be hidden");
         updateContentVisibility();
     }
 });
