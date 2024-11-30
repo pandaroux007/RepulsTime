@@ -30,20 +30,43 @@ document.addEventListener('DOMContentLoaded', function() {
         if (requirePasswordVerification) {
             console.log("SETTINGS >> password verification is required (displaying modal...)");
             const passwordModal = document.createElement('div');
-            passwordModal.innerHTML = `
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
-                        <h2 class="title">Password check</h2>
-                        <input type="password" id="verify_password" required>
-                        <button class="classic_button" id="confirm_password">Confirm</button>
-                    </div>
-                </div>
-            `;
+            passwordModal.style.position = 'fixed';
+            passwordModal.style.top = '0';
+            passwordModal.style.left = '0';
+            passwordModal.style.width = '100%';
+            passwordModal.style.height = '100%';
+            passwordModal.style.background = 'rgba(0,0,0,0.5)';
+            passwordModal.style.display = 'flex';
+            passwordModal.style.justifyContent = 'center';
+            passwordModal.style.alignItems = 'center';
+            passwordModal.style.zIndex = '1000';
+
+            const modalContent = document.createElement('div');
+            modalContent.style.background = 'white';
+            modalContent.style.padding = '20px';
+            modalContent.style.borderRadius = '8px';
+            modalContent.style.textAlign = 'center';
+
+            const title = document.createElement('h2');
+            title.className = 'title';
+            title.textContent = 'Password check';
+
+            const verifyPasswordInput = document.createElement('input');
+            verifyPasswordInput.type = 'password';
+            verifyPasswordInput.id = 'verify_password';
+            verifyPasswordInput.required = true;
+
+            const confirmPasswordBtn = document.createElement('button');
+            confirmPasswordBtn.className = 'classic_button';
+            confirmPasswordBtn.id = 'confirm_password';
+            confirmPasswordBtn.textContent = 'Confirm';
+
+            modalContent.appendChild(title);
+            modalContent.appendChild(verifyPasswordInput);
+            modalContent.appendChild(confirmPasswordBtn);
+            passwordModal.appendChild(modalContent);
             document.body.appendChild(passwordModal);
-
-            const verifyPasswordInput = passwordModal.querySelector('#verify_password');
-            const confirmPasswordBtn = passwordModal.querySelector('#confirm_password');
-
+    
             confirmPasswordBtn.addEventListener('click', async () => {
                 console.log("SETTINGS >> comfirm password button has been pressed on modal!");
                 const passwordVerified = await verifyPassword(verifyPasswordInput.value);
@@ -63,6 +86,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ***************************************************************
+    //                          time limits management functions
+    // ***************************************************************
     function loadTimeLimits() {
         console.log("SETTINGS >> loading time limits (loadTimeLimits has been called!)");
         browser.storage.local.get('timeLimits').then(result => {
@@ -73,12 +99,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayLimitsTable(limits) {
         const tableBody = document.querySelector('#time_limits_table tbody');
         tableBody.innerHTML = '';
-        for (const [jour, limite] of Object.entries(limits)) {
-            const row = tableBody.insertRow();
-            row.innerHTML = `
-                <td>${jour.charAt(0).toUpperCase() + jour.slice(1)}</td>
-                <td><input type="number" id="${jour}_limit" min="0" max="1440" value="${limite}"></td>
-            `;
+        for (const [day, limite] of Object.entries(limits)) {
+            const row = document.createElement('tr');
+            const dayCell = document.createElement('td');
+            dayCell.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+    
+            const limitCell = document.createElement('td');
+            const inputLimit = document.createElement('input');
+            inputLimit.type = 'number';
+            inputLimit.id = `${day}_limit`;
+            inputLimit.min = 0;
+            inputLimit.max = 1440;
+            inputLimit.value = limite;
+            limitCell.appendChild(inputLimit);
+            row.appendChild(dayCell);
+            row.appendChild(limitCell);
+            tableBody.appendChild(row);
         }
         console.log("SETTINGS >> time limits have been displayed on table!");
     }
@@ -87,8 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const newLimits = {};
         const inputs = document.querySelectorAll('#time_limits_table input');
         inputs.forEach(input => {
-            const jour = input.id.split('_')[0];
-            newLimits[jour] = parseInt(input.value);
+            const day = input.id.split('_')[0];
+            newLimits[day] = parseInt(input.value);
         });
 
         browser.storage.local.set({timeLimits: newLimits}).then(() => {
@@ -100,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ***************************************************************
-    //                          code section
+    //                          event section
     // ***************************************************************
     browser.storage.local.get('passwordHash').then(result => {
         if (result.passwordHash) showMainSettings(true);

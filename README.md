@@ -47,5 +47,5 @@ currently being written...
 - **`contentVisible`** : Variable containing the display state of unnecessary elements of the game's main page (suggestion of gameplay video on youtube and link group at the right bottom).
 
 ## ToDo list
-- [ ] complete settings management (html, css, javascript...);
+- [x] complete settings management (html, css, javascript...);
 - [ ] finish writing the doc (README.md file);
