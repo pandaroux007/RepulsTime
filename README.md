@@ -2,12 +2,12 @@
 
 ![GitHub](icons/banner.svg)
 
-# RepulsTime
+# [RepulsTime]
 ***Limit time spent on repuls.io***
 
 [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/pandaroux007/RepulsTime)
 [![Licence](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/pandaroux007/RepulsTime/blob/main/LICENCE.txt)
-![Firefox](https://img.shields.io/badge/Firefox-FF7139?logo=Firefox&logoColor=white&style=flat)
+[![Firefox](https://img.shields.io/badge/Firefox-FF7139?logo=Firefox&logoColor=white&style=flat)](https://addons.mozilla.org/fr/firefox/addon/repulstime/)
 [![Commits](https://img.shields.io/github/commit-activity/t/pandaroux007/RepulsTime)](https://github.com/pandaroux007/RepulsTime/commits/main/)
 [![Stars](https://img.shields.io/github/stars/pandaroux007/RepulsTime.svg?style=social&label=Stars)](https://github.com/pandaroux007/RepulsTime)
 
@@ -24,7 +24,9 @@ This extension is licensed under the MIT license (see [LICENSE.txt](LICENCE.txt)
 
 ## State
 > [!IMPORTANT]
-> This extension is in active development and is not yet fully functional (settings, repuls.io tab change detection, etc...). **DO NOT USE IT!**
+> This extension is currently finished for version 1 but placed in beta for now - **YOU CAN USE IT BUT DON'T BE SURPRISED IF YOU ENCOUNTER BUGS!**
+
+If you find any issues/bugs, report them in [a GitHub issue](https://www.github.com/pandaroux007/RepulsTime/issues). If you have an idea for improvement, suggest it in the comments on AMO on [the extension page](https://addons.mozilla.org/fr/firefox/addon/repulstime/).
 
 # Development
 currently being written...
@@ -49,3 +51,5 @@ currently being written...
 ## ToDo list
 - [x] complete settings management (html, css, javascript...);
 - [ ] finish writing the doc (README.md file);
+
+[RepulsTime]: https://addons.mozilla.org/fr/firefox/addon/repulstime/
