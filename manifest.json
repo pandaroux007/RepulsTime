@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "RepulsTime",
-    "version": "1.0.1",
+    "version": "1.2.0",
     "description": "Limit time spent on repuls.io",
     "homepage_url": "https://github.com/pandaroux007/RepulsTime",
     "icons": {
@@ -22,7 +22,7 @@
     ],
     "background": {
         "scripts": ["background.js"],
-        "persistent": false
+        "persistent": true
     },
     "content_scripts": [
         {

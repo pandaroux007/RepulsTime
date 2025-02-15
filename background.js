@@ -1,4 +1,18 @@
-console.info("the extension is ready (`background.js` is launched!)");
+// ***************************************************************
+//                          debug section
+// ***************************************************************
+const DEBUG_PRINT = true; // set to false for disable debug print
+
+if(DEBUG_PRINT)
+{
+    console.info("the extension is ready (`background.js` is launched!)");
+    console.info("debug mode is ON!");
+}
+
+function logData(msg) {
+    if(DEBUG_PRINT) console.log("BACKGROUND >>", msg);
+}
+
 // ***************************************************************
 //                          variables
 // ***************************************************************
@@ -23,15 +37,16 @@ const DEFAULT_TIME_LIMITS = {
 //                          functions
 // ***************************************************************
 function handleURLChange(tab) {
-    console.log("handleURLChange called with URL:", tab.url);
+    logData("handleURLChange called with URL:", tab.url);
     if (isRootRepulsIo(tab.url)) {
-        console.log("activeTab is repuls.io root page!");
+        logData("activeTab is repuls.io root page!");
         activeTab = tab.id;
         startTimer();
-    } else {
-        console.log("URL is not repuls.io");
+    }
+    else {
+        logData("URL is not repuls.io");
         if (activeTab !== null) {
-            console.log("stopping timer for previous repuls.io tab");
+            logData("stopping timer for previous repuls.io tab");
             stopTimer();
             activeTab = null;
         }
@@ -39,12 +54,12 @@ function handleURLChange(tab) {
 }
 
 function getDailyTimeLimit() {
-    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
     const currentDay = daysOfWeek[new Date().getDay()]; // get the time limit for the current day
     if(timeLimits[currentDay]) return(timeLimits[currentDay])
     else {
-        if(currentDay === ('wednesday' || 'saturday')) return(45);
-        else if(currentDay === 'sunday') return(0);
+        if(currentDay === ("wednesday" || "saturday")) return(45);
+        else if(currentDay === "sunday") return(0);
         else return(30);
     }
 }
@@ -71,17 +86,19 @@ function closeRepulsIoTab() {
     });
 }
 
-// ----------------------------------------------- Timer
+// ***************************************************************
+//                          timer functions
+// ***************************************************************
 function startTimer() {
     if(!timerInterval) {
-        console.log("startTimer called now!");
+        logData("startTimer called now!");
         timerInterval = setInterval(() => {
             timePlayedToday++;
 
             browser.storage.local.set({ timePlayedToday: timePlayedToday, lastDate: currentDate, timeRemaining: calculateRemainingTime()});
             
             if(isTimeLimitExceeded()) {
-                console.log("time exceeded! stopTimer and closeRepulsIoTab will be called!");
+                logData("time exceeded! stopTimer and closeRepulsIoTab will be called!");
                 stopTimer();
                 closeRepulsIoTab();
             }
@@ -91,7 +108,7 @@ function startTimer() {
 
 function stopTimer() {
     if(timerInterval) {
-        console.log("stopTimer called now!");
+        logData("stopTimer called now!");
         clearInterval(timerInterval);
         timerInterval = null;
     }
@@ -100,6 +117,7 @@ function stopTimer() {
 // ***************************************************************
 //                          listeners and init
 // ***************************************************************
+// https://developer.mozilla.org/en/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
 // listener for tab changes & tab updates
 browser.tabs.onActivated.addListener((activeInfo) => {
     browser.tabs.get(activeInfo.tabId).then((tab) => {
@@ -107,37 +125,36 @@ browser.tabs.onActivated.addListener((activeInfo) => {
     });
 });
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if(changeInfo.status === 'complete') {
-        console.log("a new tab has been opened or updated!");
+    if(changeInfo.status === "complete") {
+        logData("a new tab has been opened or updated!");
         handleURLChange(tab);
     }
 });
-//https://developer.mozilla.org/en/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
     if(activeTab === tabId) {
-        console.log("repuls.io tab closed now!");
+        logData("repuls.io tab closed now!");
         stopTimer();
         activeTab = null;
     }
 });
 
 // init > retrieve saved play time and limits
-browser.storage.local.get(['timePlayedToday', 'lastDate', 'timeLimits']).then((result) => {
+browser.storage.local.get(["timePlayedToday", "lastDate", "timeLimits"]).then((result) => {
     if(result.lastDate === currentDate) {
         timePlayedToday = result.timePlayedToday || 0;
-        console.log("today is always the last day, the counter will don't set to 0!");
+        logData("today is always the last day, the counter will don't set to 0!");
     } else { // new day
         timePlayedToday = 0;
         browser.storage.local.set({ timePlayedToday: 0, lastDate: currentDate });
-        console.log("today is a new day! The counter will set to 0!");
+        logData("today is a new day! The counter will set to 0!");
     }
     
     if(!result.timeLimits) {
-        console.log("timeLimits not found, use DEFAULT_TIME_LIMITS!");
+        logData("timeLimits not found, use DEFAULT_TIME_LIMITS!");
         browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
         timeLimits = DEFAULT_TIME_LIMITS;
     } else {
-        console.log("timeLimits founded, use it.");
+        logData("timeLimits founded, use it.");
         timeLimits = result.timeLimits;
     }
 
@@ -150,7 +167,7 @@ browser.storage.local.get(['timePlayedToday', 'lastDate', 'timeLimits']).then((r
 browser.webRequest.onBeforeRequest.addListener(
     (details) => {
         if(isTimeLimitExceeded() && isRootRepulsIo(details.url)) {
-            console.log("here is repuls.io tab but time limit is exceeded! redirecting to the \"blocked\" page!");
+            logData("here is repuls.io tab but time limit is exceeded! redirecting to the \"blocked\" page!");
             browser.tabs.update(details.tabId, {url: browser.runtime.getURL("blocked/blocked.html")});
             return {cancel: true};
         }

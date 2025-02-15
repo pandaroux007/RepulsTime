@@ -19,11 +19,12 @@ function updateTimerDisplay() {
     browser.storage.local.get('timeRemaining').then((result) => {
         const minutes = Math.floor(result.timeRemaining / 60);
         const secondes = result.timeRemaining % 60;
-        timerDiv.textContent = `Temps restant: ${minutes}:${secondes.toString().padStart(2, '0')}`;
+        timerDiv.textContent = `Remaining time ➜ ${minutes}:${secondes.toString().padStart(2, '0')}`;
+        requestAnimationFrame(updateTimerDisplay);
     });
 }
 
-setInterval(updateTimerDisplay, 1000);
+requestAnimationFrame(updateTimerDisplay);
 
 // youtube video suggestions window and links group at the right bottom
 let contentVisible = true;
@@ -40,14 +41,13 @@ function updateContentVisibility() {
 }
 
 browser.storage.local.get('contentVisible').then((result) => {
-    contentVisible = result.contentVisible !== false;
+    contentVisible = result.contentVisible; //  !== false
     updateContentVisibility();
 });
 
 browser.runtime.onMessage.addListener((message) => {
     if(message.action === "toggleUselessContent") {
         contentVisible = message.visible;
-        console.log("useless elements on root page of repuls.io will be hidden");
         updateContentVisibility();
     }
 });
