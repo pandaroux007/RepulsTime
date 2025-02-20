@@ -8,7 +8,14 @@ const linkAtRightBottom = document.querySelector("#idLinks");
 
 function updateContentVisibility() {
     if(featuredContent) featuredContent.style.display = contentVisible ? "block" : "none";
-    if(linkAtRightBottom) linkAtRightBottom.style.cssText = contentVisible ? "display: flex; flex-direction: column; transform: scale(0.85);" : "display: none;";
+    if(linkAtRightBottom) {
+        if(contentVisible) {
+            linkAtRightBottom.style.display = "flex";
+            linkAtRightBottom.style.flexDirection = "column";
+            linkAtRightBottom.style.transform = "scale(0.85)";
+        }
+        else linkAtRightBottom.style.display = "none";
+    }
 }
 
 browser.runtime.onMessage.addListener((message) => {
@@ -22,6 +29,9 @@ browser.storage.local.get("contentVisible").then((result) => { // init
     contentVisible = result.contentVisible !== false;
     updateContentVisibility();
 });
+
+const observer = new MutationObserver(updateContentVisibility);
+observer.observe(document.body, { childList: true, subtree: true });
 
 // ***************************************************************
 //                          timer displaying management
@@ -47,9 +57,7 @@ function updateTimerDisplay() {
     browser.storage.local.get("timeRemaining").then((result) => {
         const minutes = Math.floor(result.timeRemaining / 60);
         const seconds = result.timeRemaining % 60;
-
-        if(timerDiv) timerDiv.textContent = `Remaining time ➜ ${minutes}:${seconds.toString().padStart(2, "0")}`;
-
+        timerDiv.textContent = `Remaining time ➜ ${minutes}:${seconds.toString().padStart(2, "0")}`;
         requestAnimationFrame(updateTimerDisplay);
     });
 }

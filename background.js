@@ -1,6 +1,3 @@
-// ce fichier est une copie modifiée de l'extension d'origine, dédiée aux tests
-// les commentaires ne sont pas à jour par rapport aux code!
-
 // ***************************************************************
 //                          debug section
 // ***************************************************************
@@ -57,15 +54,26 @@ function handleURLChange(tab) {
     }
 }
 
+function handleFocusChange(windowId) {
+    if (windowId === browser.windows.WINDOW_ID_NONE) {
+        logData("window lost focus, stopping timer");
+        stopTimer();
+    }
+    else {
+        browser.windows.get(windowId, { populate: true }).then((window) => {
+            const activeTab = window.tabs.find(tab => tab.active);
+            if(activeTab) {
+                logData("window take focus, starting timer");
+                handleURLChange(activeTab);
+            }
+        });
+    }
+}
+
 function getDailyTimeLimit() {
     const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    const currentDay = daysOfWeek[new Date().getDay()]; // get the time limit for the current day
-    if(timeLimits[currentDay]) return(timeLimits[currentDay])
-    else {
-        if(currentDay === ("wednesday" || "saturday")) return(45);
-        else if(currentDay === "sunday") return(0);
-        else return(30);
-    }
+    const currentDay = daysOfWeek[new Date().getDay()];
+    return timeLimits[currentDay] || DEFAULT_TIME_LIMITS[currentDay];
 }
 
 function calculateRemainingTime() {
@@ -142,12 +150,15 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
     }
 });
 
+browser.windows.onFocusChanged.addListener(handleFocusChange);
+
 // init > retrieve saved play time and limits
 browser.storage.local.get(["contentVisible", "lastDate", "timeLimits"]).then((result) => {
     if(result.lastDate === currentDate) {
         timePlayedToday = getDailyTimeLimit() * 60 - result.timeRemaining || 0;
         logData("today is always the last day, the counter will don't set to 0!");
-    } else { // new day
+    }
+    else { // new day
         timePlayedToday = 0;
         browser.storage.local.set({ lastDate: currentDate });
         logData("today is a new day! The counter will set to 0!");
@@ -157,7 +168,8 @@ browser.storage.local.get(["contentVisible", "lastDate", "timeLimits"]).then((re
         logData("timeLimits not found, use the default time limits!");
         browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
         timeLimits = DEFAULT_TIME_LIMITS;
-    } else {
+    }
+    else {
         logData("timeLimits founded, use it.");
         timeLimits = result.timeLimits;
     }
