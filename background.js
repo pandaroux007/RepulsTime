@@ -25,7 +25,7 @@ let activeTab = null;
 let currentDate = new Date().toDateString();
 let timeLimits = {};
 
-const LINK_GAME = "127.0.0.1:5500/"
+const LINK_GAME = "repuls.io/"
 const DEFAULT_TIME_LIMITS = {
     monday: 30,
     tuesday: 30,
