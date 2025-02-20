@@ -3,27 +3,27 @@ body {
     font-family: arial, sans-serif;
     line-height: 1.6;
     font-weight: bold;
-    color: #2B2B2B;
+    color: #2b2b2b;
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #F4F4F4;
+    background-color: #f4f4f4;
     text-align: center;
 }
 
 .settings_container {
-    background-color: #FFF;
+    background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 /************************************ widgets ************************************/
-.title {color: #3498DB}
-.danger_title {color: #E74C3C}
+.title {color: #3498db}
+.danger_title {color: #e74c3c}
 
 button {
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     border: none;
     padding: 10px 20px;
@@ -32,24 +32,24 @@ button {
     transition: background-color 0.3s;
 }
 
-.classic_button {background-color: #3498DB}
-.classic_button:hover {background-color: #2980B9}
-.danger_button {background-color: #E74C3C}
-.danger_button:hover {background-color: #C0392B}
+.classic_button {background-color: #3498db}
+.classic_button:hover {background-color: #2980b9}
+.danger_button {background-color: #e74c3c}
+.danger_button:hover {background-color: #c0392b}
 
 input[type="number"] {border-radius: 4px}
 input[type="password"] {border-radius: 20px}
 input[type="number"], input[type="password"] {
     padding: 8px;
     margin-bottom: 15px;
-    border: 1px solid #DDD;
+    border: 1px solid #ddd;
 }
 #initial_password {min-width: 250px}
 
 /************************************ time limits section ************************************/
 .time_limits, .password_section {margin-bottom: 30px}
 .time_limits {
-    border-bottom: 1px solid #DDD;
+    border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
 }
 
@@ -61,18 +61,18 @@ input[type="number"], input[type="password"] {
 
 #time_limits_table th,
 #time_limits_table td {
-    border: 1px solid #DDD;
+    border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
 
-#time_limits_table th {background-color: #F2F2F2}
+#time_limits_table th {background-color: #f2f2f2}
 #time_limits_table input[type="number"] {width: 80px}
 
 /************************************ password section ************************************/
 .danger_zone {
     border-radius: 5px;
-    border: 2px solid #E74C3C;
+    border: 2px solid #e74c3c;
     display: flex;
     flex-direction: column;
 }

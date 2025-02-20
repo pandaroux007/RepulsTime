@@ -19,7 +19,8 @@
             <input type="password" id="initial_password" required>
             <button class="classic_button" id="set_initial_password">Set password</button>
         </div>
-        <div id="main_settings" style="display: none;">
+        <!-- displayed after the user enters their password -->
+        <main id="main_settings" style="display: none;">
             <div class="time_limits">
                 <h2 class="title">Maximum play time per day</h2>
                 <table id="time_limits_table">
@@ -50,7 +51,7 @@
                     <button class="danger_button" id="change_password">Change password</button>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
     <!--load javascript -->
     <script src="settings.js"></script>

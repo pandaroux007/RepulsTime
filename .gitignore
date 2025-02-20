@@ -1,3 +1,5 @@
-doctemp.txt
-RepulsTime-*.*
+temp.txt
+*.crx
+*.zip
+*.xpi 
 icons/icon.png

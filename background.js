@@ -1,3 +1,6 @@
+// ce fichier est une copie modifiée de l'extension d'origine, dédiée aux tests
+// les commentaires ne sont pas à jour par rapport aux code!
+
 // ***************************************************************
 //                          debug section
 // ***************************************************************
@@ -22,7 +25,7 @@ let activeTab = null;
 let currentDate = new Date().toDateString();
 let timeLimits = {};
 
-const LINK_GAME = "repuls.io/"
+const LINK_GAME = "127.0.0.1:5500/"
 const DEFAULT_TIME_LIMITS = {
     monday: 30,
     tuesday: 30,
@@ -32,6 +35,7 @@ const DEFAULT_TIME_LIMITS = {
     saturday: 45,
     sunday: 30
 };
+const DEFAULT_STATE_DISPLAYING_USELESS_ELEMENTS = true;
 
 // ***************************************************************
 //                          functions
@@ -95,7 +99,7 @@ function startTimer() {
         timerInterval = setInterval(() => {
             timePlayedToday++;
 
-            browser.storage.local.set({ timePlayedToday: timePlayedToday, lastDate: currentDate, timeRemaining: calculateRemainingTime()});
+            browser.storage.local.set({ timeRemaining: calculateRemainingTime(), lastDate: currentDate });
             
             if(isTimeLimitExceeded()) {
                 logData("time exceeded! stopTimer and closeRepulsIoTab will be called!");
@@ -139,18 +143,18 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
 });
 
 // init > retrieve saved play time and limits
-browser.storage.local.get(["timePlayedToday", "lastDate", "timeLimits"]).then((result) => {
+browser.storage.local.get(["contentVisible", "lastDate", "timeLimits"]).then((result) => {
     if(result.lastDate === currentDate) {
-        timePlayedToday = result.timePlayedToday || 0;
+        timePlayedToday = getDailyTimeLimit() * 60 - result.timeRemaining || 0;
         logData("today is always the last day, the counter will don't set to 0!");
     } else { // new day
         timePlayedToday = 0;
-        browser.storage.local.set({ timePlayedToday: 0, lastDate: currentDate });
+        browser.storage.local.set({ lastDate: currentDate });
         logData("today is a new day! The counter will set to 0!");
     }
     
     if(!result.timeLimits) {
-        logData("timeLimits not found, use DEFAULT_TIME_LIMITS!");
+        logData("timeLimits not found, use the default time limits!");
         browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
         timeLimits = DEFAULT_TIME_LIMITS;
     } else {
@@ -159,7 +163,7 @@ browser.storage.local.get(["timePlayedToday", "lastDate", "timeLimits"]).then((r
     }
 
     if (result.contentVisible === undefined) {
-        browser.storage.local.set({ contentVisible: true });
+        browser.storage.local.set({ contentVisible: DEFAULT_STATE_DISPLAYING_USELESS_ELEMENTS });
     }
 });
 
