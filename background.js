@@ -129,39 +129,16 @@ function stopTimer() {
 // ***************************************************************
 //                          listeners and init
 // ***************************************************************
-// https://developer.mozilla.org/en/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
-// listener for tab changes & tab updates
-browser.tabs.onActivated.addListener((activeInfo) => {
-    browser.tabs.get(activeInfo.tabId).then((tab) => {
-        handleURLChange(tab);
-    });
-});
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if(changeInfo.status === "complete") {
-        logData("a new tab has been opened or updated!");
-        handleURLChange(tab);
-    }
-});
-browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    if(activeTab === tabId) {
-        logData("repuls.io tab closed now!");
-        stopTimer();
-        activeTab = null;
-    }
-});
-
-browser.windows.onFocusChanged.addListener(handleFocusChange);
-
 // init > retrieve saved play time and limits
-browser.storage.local.get(["contentVisible", "lastDate", "timeLimits"]).then((result) => {
+browser.storage.local.get(["contentVisible", "lastDate", "timeLimits", "timeRemaining"]).then((result) => {
     if(result.lastDate === currentDate) {
         timePlayedToday = getDailyTimeLimit() * 60 - result.timeRemaining || 0;
-        logData("today is always the last day, the counter will don't set to 0!");
+        logData("today is always the last day, the counter will not be set to 0!");
     }
     else { // new day
         timePlayedToday = 0;
         browser.storage.local.set({ lastDate: currentDate });
-        logData("today is a new day! The counter will set to 0!");
+        logData("today is a new day! The counter will be set to 0!");
     }
     
     if(!result.timeLimits) {
@@ -191,3 +168,26 @@ browser.webRequest.onBeforeRequest.addListener(
     {urls: [`*://${LINK_GAME}`]},
     ["blocking"]
 );
+
+// https://developer.mozilla.org/en/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onActivated
+// listener for tab changes & tab updates
+browser.tabs.onActivated.addListener((activeInfo) => {
+    browser.tabs.get(activeInfo.tabId).then((tab) => {
+        handleURLChange(tab);
+    });
+});
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if(changeInfo.status === "complete") {
+        logData("a new tab has been opened or updated!");
+        handleURLChange(tab);
+    }
+});
+browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
+    if(activeTab === tabId) {
+        logData("repuls.io tab closed now!");
+        stopTimer();
+        activeTab = null;
+    }
+});
+
+browser.windows.onFocusChanged.addListener(handleFocusChange);
