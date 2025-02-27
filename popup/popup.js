@@ -1,13 +1,4 @@
-// ***************************************************************
-//                          debug section
-// ***************************************************************
-const DEBUG_PRINT = true; // set to false for disable debug print
-function logData(msg) {
-    if(DEBUG_PRINT) console.log("POPUP >>", msg);
-}
-
 document.addEventListener("DOMContentLoaded", function() {
-    if(DEBUG_PRINT) console.info("POPUP >> popup has been opened!");
     // update time on the window
     function formatTime(paramSeconds) {
         const minutes = Math.floor(paramSeconds / 60);
@@ -34,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // settings button click event management
     document.getElementById("settings_button").addEventListener("click", () => {
-        logData("settings button has been clicked! opening settings...");
         browser.tabs.create({url: "../settings/settings.html"});
     });
 
@@ -45,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     toggleSwitchUselessContent.addEventListener("change", (event) => {
-        logData("the state of useless elements button has been changed!");
         const isChecked = event.target.checked;
         browser.storage.local.set({ contentVisible: isChecked });
 
@@ -53,11 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
             browser.tabs.sendMessage(tabs[0].id, {
                 action: "toggleUselessContent",
                 visible: isChecked
-            }).catch((error) => {
-                logData("error for hide useless element (content.js isn't active ?)\n" + error);
-            });
+            })
         });
-        
-        logData(`the visibility of useless elements is ${isChecked} now!`);
     });
 });

@@ -1,19 +1,4 @@
 // ***************************************************************
-//                          debug section
-// ***************************************************************
-const DEBUG_PRINT = true; // set to false for disable debug print
-
-if(DEBUG_PRINT)
-{
-    console.info("the extension is ready (`background.js` is launched!)");
-    console.info("debug mode is ON!");
-}
-
-function logData(msg) {
-    if(DEBUG_PRINT) console.log("BACKGROUND >>", msg);
-}
-
-// ***************************************************************
 //                          variables
 // ***************************************************************
 let timePlayedToday = 0;
@@ -38,16 +23,12 @@ const DEFAULT_STATE_DISPLAYING_USELESS_ELEMENTS = true;
 //                          functions
 // ***************************************************************
 function handleURLChange(tab) {
-    logData("handleURLChange called with URL:", tab.url);
     if (isRootRepulsIo(tab.url)) {
-        logData("activeTab is repuls.io root page!");
         activeTab = tab.id;
         startTimer();
     }
     else {
-        logData("URL is not repuls.io");
         if (activeTab !== null) {
-            logData("stopping timer for previous repuls.io tab");
             stopTimer();
             activeTab = null;
         }
@@ -56,14 +37,12 @@ function handleURLChange(tab) {
 
 function handleFocusChange(windowId) {
     if (windowId === browser.windows.WINDOW_ID_NONE) {
-        logData("window lost focus, stopping timer");
         stopTimer();
     }
     else {
         browser.windows.get(windowId, { populate: true }).then((window) => {
             const activeTab = window.tabs.find(tab => tab.active);
             if(activeTab) {
-                logData("window take focus, starting timer");
                 handleURLChange(activeTab);
             }
         });
@@ -103,14 +82,12 @@ function closeRepulsIoTab() {
 // ***************************************************************
 function startTimer() {
     if(!timerInterval) {
-        logData("startTimer called now!");
         timerInterval = setInterval(() => {
             timePlayedToday++;
 
             browser.storage.local.set({ timeRemaining: calculateRemainingTime(), lastDate: currentDate });
             
             if(isTimeLimitExceeded()) {
-                logData("time exceeded! stopTimer and closeRepulsIoTab will be called!");
                 stopTimer();
                 closeRepulsIoTab();
             }
@@ -120,7 +97,6 @@ function startTimer() {
 
 function stopTimer() {
     if(timerInterval) {
-        logData("stopTimer called now!");
         clearInterval(timerInterval);
         timerInterval = null;
     }
@@ -133,21 +109,17 @@ function stopTimer() {
 browser.storage.local.get(["contentVisible", "lastDate", "timeLimits", "timeRemaining"]).then((result) => {
     if(result.lastDate === currentDate) {
         timePlayedToday = getDailyTimeLimit() * 60 - result.timeRemaining || 0;
-        logData("today is always the last day, the counter will not be set to 0!");
     }
     else { // new day
         timePlayedToday = 0;
         browser.storage.local.set({ lastDate: currentDate });
-        logData("today is a new day! The counter will be set to 0!");
     }
     
     if(!result.timeLimits) {
-        logData("timeLimits not found, use the default time limits!");
         browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
         timeLimits = DEFAULT_TIME_LIMITS;
     }
     else {
-        logData("timeLimits founded, use it.");
         timeLimits = result.timeLimits;
     }
 
@@ -160,7 +132,6 @@ browser.storage.local.get(["contentVisible", "lastDate", "timeLimits", "timeRema
 browser.webRequest.onBeforeRequest.addListener(
     (details) => {
         if(isTimeLimitExceeded() && isRootRepulsIo(details.url)) {
-            logData("here is repuls.io tab but time limit is exceeded! redirecting to the \"blocked\" page!");
             browser.tabs.update(details.tabId, {url: browser.runtime.getURL("blocked/blocked.html")});
             return {cancel: true};
         }
@@ -178,13 +149,11 @@ browser.tabs.onActivated.addListener((activeInfo) => {
 });
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if(changeInfo.status === "complete") {
-        logData("a new tab has been opened or updated!");
         handleURLChange(tab);
     }
 });
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
     if(activeTab === tabId) {
-        logData("repuls.io tab closed now!");
         stopTimer();
         activeTab = null;
     }

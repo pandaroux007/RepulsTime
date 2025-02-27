@@ -6,15 +6,15 @@ function logData(msg) {
     if(DEBUG_PRINT) console.log("SETTINGS >>", msg);
 }
 
+const GREEN = "#008000";
+const RED = "#e74c3c"
+
 document.addEventListener("DOMContentLoaded", function() {
     if(DEBUG_PRINT) console.info("SETTINGS >> settings have been opened!");
 
     const passwordSetup = document.getElementById("password_setup");
-    // ------------------
     const mainSettings = document.getElementById("main_settings");
     const changeTimeLimitsInfo = document.getElementById("change_time_limits_info");
-    // ------------------
-    const changePasswordInfo = document.getElementById("change_password_info")
     const currentPasswordInput = document.getElementById("current_password");
     const newPasswordInput = document.getElementById("new_password");
     
@@ -34,60 +34,66 @@ document.addEventListener("DOMContentLoaded", function() {
         return result.passwordHash === inputHash;
     }
 
+    function displayChangePasswordInfo(text, color) {
+        const changePasswordInfo = document.getElementById("change_password_info")
+        changePasswordInfo.style.display = "block"
+        changePasswordInfo.style.color = color;
+        changePasswordInfo.style.fontStyle = "italic";
+        changePasswordInfo.innerText = text;
+    }
+
+    function createModal() {
+        const passwordModal = document.createElement("div");
+        passwordModal.classList.add("password_modal");
+
+        const modalContent = document.createElement("div");
+        modalContent.classList.add("modal_content");
+
+        const title = document.createElement("h2");
+        title.className = "title";
+        title.textContent = "Password check";
+
+        const verifyPasswordInput = document.createElement("input");
+        verifyPasswordInput.type = "password";
+        verifyPasswordInput.id = "verify_password";
+        verifyPasswordInput.required = true;
+
+        const confirmPasswordBtn = document.createElement("button");
+        confirmPasswordBtn.className = "classic_button";
+        confirmPasswordBtn.id = "confirm_password";
+        confirmPasswordBtn.textContent = "Confirm";
+
+        modalContent.appendChild(title);
+        modalContent.appendChild(verifyPasswordInput);
+        modalContent.appendChild(confirmPasswordBtn);
+        passwordModal.appendChild(modalContent);
+        document.body.appendChild(passwordModal);
+
+        return({passwordModal, verifyPasswordInput, confirmPasswordBtn});
+    }
+
     function showMainSettings(requirePasswordVerification = true) {
         if (requirePasswordVerification) {
-            logData("SETTINGS >> password verification is required (displaying modal...)");
-            const passwordModal = document.createElement("div");
-            passwordModal.style.position = "fixed";
-            passwordModal.style.top = "0";
-            passwordModal.style.left = "0";
-            passwordModal.style.width = "100%";
-            passwordModal.style.height = "100%";
-            passwordModal.style.background = "rgba(0,0,0,0.5)";
-            passwordModal.style.display = "flex";
-            passwordModal.style.justifyContent = "center";
-            passwordModal.style.alignItems = "center";
-            passwordModal.style.zIndex = "1000";
+            logData("password verification is required (displaying modal...)");
+            const { passwordModal, verifyPasswordInput, confirmPasswordBtn } = createModal();
 
-            const modalContent = document.createElement("div");
-            modalContent.style.background = "white";
-            modalContent.style.padding = "20px";
-            modalContent.style.borderRadius = "8px";
-            modalContent.style.textAlign = "center";
-
-            const title = document.createElement("h2");
-            title.className = "title";
-            title.textContent = "Password check";
-
-            const verifyPasswordInput = document.createElement("input");
-            verifyPasswordInput.type = "password";
-            verifyPasswordInput.id = "verify_password";
-            verifyPasswordInput.required = true;
-
-            const confirmPasswordBtn = document.createElement("button");
-            confirmPasswordBtn.className = "classic_button";
-            confirmPasswordBtn.id = "confirm_password";
-            confirmPasswordBtn.textContent = "Confirm";
-
-            modalContent.appendChild(title);
-            modalContent.appendChild(verifyPasswordInput);
-            modalContent.appendChild(confirmPasswordBtn);
-            passwordModal.appendChild(modalContent);
-            document.body.appendChild(passwordModal);
-    
             confirmPasswordBtn.addEventListener("click", async () => {
-                logData("SETTINGS >> comfirm password button has been pressed on modal!");
+                logData("confirm password button has been pressed on modal!");
                 const passwordVerified = await verifyPassword(verifyPasswordInput.value);
                 if (passwordVerified) {
                     passwordModal.remove();
                     passwordSetup.style.display = "none";
                     mainSettings.style.display = "block";
-                    logData("SETTINGS >> password is correct! displaying main settings...");
+                    logData("password is correct! displaying main settings...");
                     loadTimeLimits();
-                } else logData("SETTINGS >> password isn't correct! user maybe retry ?");
+                }
+                else {
+                    logData("password isn't correct! user maybe retry?");
+                }
             });
-        } else {
-            logData("SETTINGS >> displaying main settings...");
+        }
+        else {
+            logData("displaying main settings...");
             passwordSetup.style.display = "none";
             mainSettings.style.display = "block";
             loadTimeLimits();
@@ -98,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //                          time limits management functions
     // ***************************************************************
     function loadTimeLimits() {
-        logData("SETTINGS >> loading time limits (loadTimeLimits has been called!)");
+        logData("loading time limits (loadTimeLimits has been called!)");
         browser.storage.local.get("timeLimits").then(result => {
             displayLimitsTable(result.timeLimits);
         });
@@ -124,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function() {
             row.appendChild(limitCell);
             tableBody.appendChild(row);
         }
-        logData("SETTINGS >> time limits have been displayed on table!");
+        logData("time limits have been displayed on table!");
     }
 
     async function saveLimits() {
@@ -136,10 +142,9 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         browser.storage.local.set({timeLimits: newLimits}).then(() => {
-            const txtInfo = "Time limits have been successfully saved!"
-            logData(`SETTINGS >> ${txtInfo}`);
-            changeTimeLimitsInfo.style = "display: block; color: #008000"
-            changeTimeLimitsInfo.innerHTML = `<i>${txtInfo}</i>`;
+            changeTimeLimitsInfo.style.display = "block";
+            changeTimeLimitsInfo.style.color = GREEN;
+            changeTimeLimitsInfo.innerText = "Time limits have been successfully saved!";
         });
     }
 
@@ -156,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     const changePasswordBtn = document.getElementById("change_password");
     changePasswordBtn.addEventListener("click", async () => {
-        logData("SETTINGS >> change password button has been pressed!");
+        logData("change password button has been pressed!");
         const currentPassword = currentPasswordInput.value;
         const newPassword = newPasswordInput.value;
 
@@ -168,36 +173,34 @@ document.addEventListener("DOMContentLoaded", function() {
                     await browser.storage.local.set({passwordHash: newHash});
                     currentPasswordInput.value = "";
                     newPasswordInput.value = "";
-                    changePasswordInfo.style = "display: block; color: #008000";
-                    changePasswordInfo.innerHTML = "<i>Password successfully changed. This tab will close in 3 seconds.</i>";
-                    logData("SETTINGS >> password changed!");
+                    displayChangePasswordInfo("Password successfully changed. This tab will close in 3 seconds.", GREEN);
+                    logData("password changed!");
                     
                     setTimeout(() => {
                         browser.tabs.getCurrent().then(tab => {
                             browser.tabs.remove(tab.id);
                         });
                     }, 3000);
-                } else {
-                    changePasswordInfo.style = "display: block; color: #E74C3C";
-                    changePasswordInfo.innerHTML = "<i>Current password is incorrect, please retry</i>";
-                    logData("SETTINGS >> password isn't correct, user maybe retry!");
                 }
-            } catch (error) {
-                if(DEBUG_PRINT) console.info("SETTINGS >> error changing password: " + error);
-                changePasswordInfo.style = "display: block; color: #E74C3C";
-                changePasswordInfo.innerHTML = "<i>An error occurred. Please try again.</i>";
+                else {
+                    displayChangePasswordInfo("Current password is incorrect, please retry", RED);
+                    logData("password isn't correct, user maybe retry!");
+                }
             }
-        } else {
-            changePasswordInfo.style = "display: block; color: #E74C3C";
-            changePasswordInfo.innerHTML = "<i>Please complete all entries to change password</i>";
-            logData("SETTINGS >> change password button pressed but not all entries have been completed!");
+            catch (error) {
+                if(DEBUG_PRINT) console.info("error changing password: " + error);
+                displayChangePasswordInfo("An error occurred. Please try again.", RED);
+            }
+        }
+        else {
+            displayChangePasswordInfo("Please complete all entries to change password", RED);
+            logData("change password button pressed but not all entries have been completed!");
         }
     });
 
     const setInitialPasswordBtn = document.getElementById("set_initial_password");
     setInitialPasswordBtn.addEventListener("click", async () => {
-        const initialPasswordInput = document.getElementById("initial_password");
-        const password = initialPasswordInput.value;
+        const password = document.getElementById("initial_password").value;
         if (password) {
             const hash = await hashPassword(password);
             browser.storage.local.set({passwordHash: hash}).then(() => {
