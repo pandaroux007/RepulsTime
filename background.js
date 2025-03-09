@@ -7,7 +7,7 @@ let activeTab = null;
 let currentDate = new Date().toDateString();
 let timeLimits = {};
 
-const LINK_GAME = "repuls.io/"
+const LINK_GAME = "repuls.io/";
 const DEFAULT_TIME_LIMITS = {
     monday: 30,
     tuesday: 30,
@@ -15,7 +15,7 @@ const DEFAULT_TIME_LIMITS = {
     thursday: 30,
     friday: 45,
     saturday: 45,
-    sunday: 30
+    sunday: 0
 };
 const DEFAULT_STATE_DISPLAYING_USELESS_ELEMENTS = true;
 
@@ -102,31 +102,35 @@ function stopTimer() {
     }
 }
 
+function initStorage() {
+    // init > retrieve saved play time and limits
+    browser.storage.local.get(["contentVisible", "lastDate", "timeLimits", "timeRemaining"]).then((result) => {
+        if(result.lastDate === currentDate) {
+            timePlayedToday = getDailyTimeLimit() * 60 - result.timeRemaining || 0;
+        }
+        else { // new day
+            timePlayedToday = 0;
+            browser.storage.local.set({ lastDate: currentDate });
+        }
+        
+        if(!result.timeLimits) {
+            browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
+            timeLimits = DEFAULT_TIME_LIMITS;
+        }
+        else {
+            timeLimits = result.timeLimits;
+        }
+
+        if (result.contentVisible === undefined) {
+            browser.storage.local.set({ contentVisible: DEFAULT_STATE_DISPLAYING_USELESS_ELEMENTS });
+        }
+    });
+}
+
 // ***************************************************************
 //                          listeners and init
 // ***************************************************************
-// init > retrieve saved play time and limits
-browser.storage.local.get(["contentVisible", "lastDate", "timeLimits", "timeRemaining"]).then((result) => {
-    if(result.lastDate === currentDate) {
-        timePlayedToday = getDailyTimeLimit() * 60 - result.timeRemaining || 0;
-    }
-    else { // new day
-        timePlayedToday = 0;
-        browser.storage.local.set({ lastDate: currentDate });
-    }
-    
-    if(!result.timeLimits) {
-        browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
-        timeLimits = DEFAULT_TIME_LIMITS;
-    }
-    else {
-        timeLimits = result.timeLimits;
-    }
-
-    if (result.contentVisible === undefined) {
-        browser.storage.local.set({ contentVisible: DEFAULT_STATE_DISPLAYING_USELESS_ELEMENTS });
-    }
-});
+initStorage();
 
 // listerner for blocking after time limit
 browser.webRequest.onBeforeRequest.addListener(
@@ -160,3 +164,10 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
 });
 
 browser.windows.onFocusChanged.addListener(handleFocusChange);
+
+// listener for time limits update
+browser.runtime.onMessage.addListener((message) => {
+    if (message.action === "timeLimitsUpdated") {
+        initStorage();
+    }
+});

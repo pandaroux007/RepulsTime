@@ -36,6 +36,18 @@ observer.observe(document.body, { childList: true, subtree: true });
 // ***************************************************************
 //                          timer displaying management
 // ***************************************************************
+const style = document.createElement("style");
+style.textContent = `
+@keyframes blink {
+    0% {background-color: rgba(0, 0, 0, 0.7)}
+    50% {background-color: rgba(255, 0, 0, 0.7)}
+    100% {background-color: rgba(0, 0, 0, 0.7)}
+}
+
+.blink {animation: blink 1s infinite}
+`;
+document.head.appendChild(style);
+
 const timerDiv = document.createElement("div");
 timerDiv.style.cssText = `
 position: fixed;
@@ -58,6 +70,9 @@ function updateTimerDisplay() {
         const minutes = Math.floor(result.timeRemaining / 60);
         const seconds = result.timeRemaining % 60;
         timerDiv.textContent = `Remaining time ➜ ${minutes}:${seconds.toString().padStart(2, "0")}`;
+        
+        result.timeRemaining <= 30 ? timerDiv.classList.add("blink") : timerDiv.classList.remove("blink");
+
         requestAnimationFrame(updateTimerDisplay);
     });
 }

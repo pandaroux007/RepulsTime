@@ -19,6 +19,8 @@
     text-align: center;
 }
 
+#verify_password {margin: 5px}
+
 /************************************ main ************************************/
 body {
     font-family: arial, sans-serif;
@@ -101,4 +103,16 @@ input[type="number"], input[type="password"] {
 label {
     display: block;
     margin-bottom: 5px;
+}
+
+/************************************ icons at top ************************************/
+#icons {
+    position: fixed;
+    top: 5px;
+    right: 5px;
+}
+
+#icons a {
+    color: #2b2b2b;
+    text-decoration: none;
 }

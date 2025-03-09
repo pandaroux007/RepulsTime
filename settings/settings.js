@@ -7,7 +7,7 @@ function logData(msg) {
 }
 
 const GREEN = "#008000";
-const RED = "#e74c3c"
+const RED = "#e74c3c";
 
 document.addEventListener("DOMContentLoaded", function() {
     if(DEBUG_PRINT) console.info("SETTINGS >> settings have been opened!");
@@ -146,6 +146,8 @@ document.addEventListener("DOMContentLoaded", function() {
             changeTimeLimitsInfo.style.color = GREEN;
             changeTimeLimitsInfo.innerText = "Time limits have been successfully saved!";
         });
+
+        browser.runtime.sendMessage({action: "timeLimitsUpdated"});
     }
 
     // ***************************************************************

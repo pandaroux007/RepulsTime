@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("time_to_play_today").textContent = result.timeLimits[currentDay] + " mn";
     });
 
-    // settings button click event management
     document.getElementById("settings_button").addEventListener("click", () => {
         browser.tabs.create({url: "../settings/settings.html"});
     });
