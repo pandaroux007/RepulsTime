@@ -8,6 +8,7 @@ let currentDate = new Date().toDateString();
 let timeLimits = {};
 
 const LINK_GAME = "repuls.io/";
+const LINK_GAME_BETA = "repuls.io/beta/";
 const DEFAULT_TIME_LIMITS = {
     monday: 30,
     tuesday: 30,
@@ -42,9 +43,7 @@ function handleFocusChange(windowId) {
     else {
         browser.windows.get(windowId, { populate: true }).then((window) => {
             const activeTab = window.tabs.find(tab => tab.active);
-            if(activeTab) {
-                handleURLChange(activeTab);
-            }
+            if(activeTab) handleURLChange(activeTab);
         });
     }
 }
@@ -117,9 +116,7 @@ function initStorage() {
             browser.storage.local.set({ timeLimits: DEFAULT_TIME_LIMITS });
             timeLimits = DEFAULT_TIME_LIMITS;
         }
-        else {
-            timeLimits = result.timeLimits;
-        }
+        else timeLimits = result.timeLimits;
 
         if (result.contentVisible === undefined) {
             browser.storage.local.set({ contentVisible: DEFAULT_STATE_DISPLAYING_USELESS_ELEMENTS });
@@ -139,8 +136,12 @@ browser.webRequest.onBeforeRequest.addListener(
             browser.tabs.update(details.tabId, {url: browser.runtime.getURL("blocked/blocked.html")});
             return {cancel: true};
         }
+        if(details.url == `https://${LINK_GAME_BETA}` || details.url == `http://${LINK_GAME_BETA}`) {
+            browser.tabs.update(details.tabId, {url: `https://${LINK_GAME}`});
+            return {cancel: true};
+        }
     },
-    {urls: [`*://${LINK_GAME}`]},
+    {urls: [`*://${LINK_GAME}*`, `*://${LINK_GAME_BETA}*`]},
     ["blocking"]
 );
 
