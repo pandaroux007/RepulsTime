@@ -25,13 +25,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
         const hash = await crypto.subtle.digest("SHA-256", data);
-        return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+        return(Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join(""));
     }
 
     async function verifyPassword(inputPassword) {
         const inputHash = await hashPassword(inputPassword);
         const result = await browser.storage.local.get("passwordHash");
-        return result.passwordHash === inputHash;
+        return(result.passwordHash === inputHash);
     }
 
     function displayChangePasswordInfo(text, color) {
@@ -87,9 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     logData("password is correct! displaying main settings...");
                     loadTimeLimits();
                 }
-                else {
-                    logData("password isn't correct! user maybe retry?");
-                }
+                else logData("password isn't correct! user maybe retry?");
             });
         }
         else {

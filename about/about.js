@@ -1,13 +1,19 @@
+function setLinkData(name, dataToSet) {
+    element = document.getElementById(name);
+    element.textContent = dataToSet;
+    element.href = dataToSet;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     fetch("../manifest.json")
     .then(response => response.json())
     .then(data => {
         document.getElementById("name").textContent = `Name : ${data.name}`;
-        document.getElementById("version").innerHTML = `Version : <span class="code">${data.version}</span>`;
+        document.getElementById("version").textContent = data.version;
         document.getElementById("description").textContent = `Description : ${data.description}`;
-        document.getElementById("homepage_url").innerHTML = `Home page : <br><a href="${data.homepage_url}" class="code">${data.homepage_url}</a>`;
+        setLinkData("homepage_url", data.homepage_url);
         document.getElementById("author_name").textContent = `Author : ${data.developer.name}`;
-        document.getElementById("author_website").innerHTML = `Website : <br><a href="${data.developer.url}" class="code">${data.developer.url}</a>`;
+        setLinkData("author_website", data.developer.url);
 
         const permissionsList = document.getElementById("permissions");
         data.permissions.forEach(permission => {
@@ -15,5 +21,9 @@ document.addEventListener("DOMContentLoaded", function() {
             li.textContent = permission;
             permissionsList.appendChild(li);
         });
+    }).catch((errorMsg) => {
+        error = document.getElementById("error");
+        error.style.display = "block";
+        error.textContent = errorMsg;
     });
 });
