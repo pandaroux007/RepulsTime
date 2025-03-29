@@ -31,7 +31,7 @@ This extension is licensed under the MIT license (see [LICENSE.txt](LICENCE.txt)
 
 ## State
 > [!IMPORTANT]
-> **This extension is currently finished for version 1 but already in active developement**. News version will be only done for fix bugs - detected by the developer, or you if you are a user of it (see [contribution section](#Contributing)) 😉
+> This extension is currently finished for version 1, but is still in active development. The new version will only be used to fix bugs found by the developer, or by you if you use it (see the "[Contribution](#contributing)" section) 😉
 
 ## Contributing
 If you find any issues/bugs, report them in [a GitHub issue](https://www.github.com/pandaroux007/RepulsTime/issues). If you have an idea for improvement, suggest it in the comments on AMO on [the extension page](https://addons.mozilla.org/en-US/firefox/addon/repulstime/).
