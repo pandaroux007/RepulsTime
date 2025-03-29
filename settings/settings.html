@@ -10,23 +10,27 @@
 </head>
 <body>
     <div id="icons">
-        <a href="../about/about.html"><img title="About RepulsTime..." src="../icons/about.svg" alt="🔧"></a>
         <a href="https://repuls.io/"><img title="Play now to repuls.io!" src="../icons/play.svg" alt="▶️"></a>
+        <a href="../about/about.html"><img title="About RepulsTime..." src="../icons/about.svg" alt="🔧"></a>
+    </div>
+    <div id="notification">
+        <h2 id="notif_title"></h2>
+        <p id="notif_info"></p>
     </div>
     <div class="settings_container">
         <img src="../icons/banner.svg" alt="RepulsTime">
-        <h1 class="title">RepulsTime's settings</h1>
+        <h1 class="blue">RepulsTime's settings</h1>
         <!-- displayed once at first start-->
         <div id="password_setup" style="display: none;">
-            <h2 class="title">Initial setup</h2>
-            <p>Please set a parental password :</p>
-            <input type="password" id="initial_password" required>
+            <h2 class="blue">Initial setup</h2>
+            <p>Please set a parental password :<br><i>(You cannot use the space symbol in your password!<br>Do not use it, it will be removed when you save your password!)</i></p>
+            <input type="password" id="initial_password" aria-label="Set the parental password here" required>
             <button class="classic_button" id="set_initial_password">Set password</button>
         </div>
         <!-- displayed after the user enters their password -->
         <main id="main_settings" style="display: none;">
-            <div class="time_limits">
-                <h2 class="title">Maximum play time per day</h2>
+            <div class="box">
+                <h2 class="blue">Maximum play time per day</h2>
                 <table id="time_limits_table">
                     <thead>
                         <tr>
@@ -42,22 +46,20 @@
                 <button class="classic_button" id="save_limits">Save time limits</button>
             </div>
             <div class="danger_zone">
-                <h2 class="danger_title">Critical zone</h2>
-                <div class="password_section">
-                    <p id="change_password_info" style="display: none;"></p>
-
+                <h2 class="red">Change password section</h2>
+                <div class="box">
                     <label for="current_password">Current password :</label>
-                    <input type="password" id="current_password" required>
+                    <input type="password" id="current_password" aria-label="Enters the current password here..." required>
 
                     <label for="new_password">New password :</label>
-                    <input type="password" id="new_password" required>
+                    <input type="password" id="new_password" aria-label="And here the new password!" required>
+
                     <br>
-                    <button class="danger_button" id="change_password">Change password</button>
+                    <button class="danger_button" id="change_password_btn">Change password</button>
                 </div>
             </div>
         </main>
     </div>
-    <!--load javascript -->
     <script src="settings.js"></script>
 </body>
 </html>

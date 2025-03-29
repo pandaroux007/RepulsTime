@@ -10,6 +10,8 @@
     justify-content: center;
     align-items: center;
     z-index: 100;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .modal_content {
@@ -42,8 +44,10 @@ body {
 }
 
 /************************************ widgets ************************************/
-.title {color: #3498db}
-.danger_title {color: #e74c3c}
+.blue {color: #3498db}
+.red {color: #e74c3c}
+
+.box {margin-bottom: 30px}
 
 button {
     color: #fff;
@@ -70,7 +74,6 @@ input[type="number"], input[type="password"] {
 #initial_password {min-width: 250px}
 
 /************************************ time limits section ************************************/
-.time_limits, .password_section {margin-bottom: 30px}
 .time_limits {
     border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
@@ -105,11 +108,11 @@ label {
     margin-bottom: 5px;
 }
 
-/************************************ icons at top ************************************/
+/************************************ icons and notification at top ************************************/
 #icons {
     position: fixed;
-    top: 5px;
-    right: 5px;
+    top: 10px;
+    right: 10px;
     z-index: 101;
 }
 
@@ -117,3 +120,21 @@ label {
     color: #2b2b2b;
     text-decoration: none;
 }
+
+#notification {
+    position: fixed;
+    left: -440px;
+    z-index: 101;
+    background-color: #e0e0e0;
+    padding: 0px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 20%;
+    line-height: 1;
+    cursor: pointer;
+    transition: left 0.5s cubic-bezier(.23,1,.32,1);
+}
+
+#notification.show {left: 20px}
+#notif_title {color: #3498db}
+#notif_info {font-style: italic;}

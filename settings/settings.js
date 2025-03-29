@@ -1,211 +1,249 @@
-// ***************************************************************
-//                          debug section
-// ***************************************************************
-const DEBUG_PRINT = true; // set to false for disable debug print
-function logData(msg) {
-    if(DEBUG_PRINT) console.log("SETTINGS >>", msg);
-}
-
 const GREEN = "#008000";
 const RED = "#e74c3c";
 
-document.addEventListener("DOMContentLoaded", function() {
-    if(DEBUG_PRINT) console.info("SETTINGS >> settings have been opened!");
+const passwordSetup = document.getElementById("password_setup");
+const mainSettings = document.getElementById("main_settings");
+const notification = document.getElementById("notification");
 
-    const passwordSetup = document.getElementById("password_setup");
-    const mainSettings = document.getElementById("main_settings");
-    const changeTimeLimitsInfo = document.getElementById("change_time_limits_info");
-    const currentPasswordInput = document.getElementById("current_password");
-    const newPasswordInput = document.getElementById("new_password");
-    
-    // ***************************************************************
-    //                          utils functions
-    // ***************************************************************
-    async function hashPassword(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hash = await crypto.subtle.digest("SHA-256", data);
-        return(Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join(""));
+const setInitialPasswordBtn = document.getElementById("set_initial_password");
+const initialPasswordInput = document.getElementById("initial_password");
+
+const currentPasswordInput = document.getElementById("current_password");
+const newPasswordInput = document.getElementById("new_password");
+const changePasswordBtn = document.getElementById("change_password_btn");
+
+function handleEnterKey(inputElement, callback) {
+    inputElement.addEventListener("keypress", async (event) => {
+        if (event.key === "Enter") await callback();
+    });
+}
+
+function toggleVisibility(element, isVisible) {
+    element.style.display = isVisible ? "block" : "none";
+}
+
+// ***************************************************************
+//                          password functions
+// ***************************************************************
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return(Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join(""));
+}
+
+async function verifyPassword(inputPassword) {
+    const inputHash = await hashPassword(inputPassword);
+    const result = await browser.storage.local.get("passwordHash");
+    return(result.passwordHash === inputHash);
+}
+
+async function setInitialPassword() {
+    const password = initialPasswordInput.value.trim();
+    if (!password) {
+        showNotify("Error to set password!", "Password cannot be empty.", true);
+        return;
     }
-
-    async function verifyPassword(inputPassword) {
-        const inputHash = await hashPassword(inputPassword);
-        const result = await browser.storage.local.get("passwordHash");
-        return(result.passwordHash === inputHash);
+    else {
+        const hash = await hashPassword(password);
+        await browser.storage.local.set({ passwordHash: hash });
+        showMainSettings(false);
+        showNotify("Your password is perfect!", "Welcome to RepulsTime's settings!", false);
     }
+}
 
-    function displayChangePasswordInfo(text, color) {
-        const changePasswordInfo = document.getElementById("change_password_info")
-        changePasswordInfo.style.display = "block"
-        changePasswordInfo.style.color = color;
-        changePasswordInfo.style.fontStyle = "italic";
-        changePasswordInfo.innerText = text;
-    }
+async function setNewPassword() {
+    const currentPassword = currentPasswordInput.value;
+    const newPassword = newPasswordInput.value;
 
-    function createModal() {
-        const passwordModal = document.createElement("div");
-        passwordModal.classList.add("password_modal");
-
-        const modalContent = document.createElement("div");
-        modalContent.classList.add("modal_content");
-
-        const title = document.createElement("h2");
-        title.className = "title";
-        title.textContent = "Password check";
-
-        const verifyPasswordInput = document.createElement("input");
-        verifyPasswordInput.type = "password";
-        verifyPasswordInput.id = "verify_password";
-        verifyPasswordInput.required = true;
-
-        const confirmPasswordBtn = document.createElement("button");
-        confirmPasswordBtn.className = "classic_button";
-        confirmPasswordBtn.id = "confirm_password";
-        confirmPasswordBtn.textContent = "Confirm";
-
-        modalContent.appendChild(title);
-        modalContent.appendChild(verifyPasswordInput);
-        modalContent.appendChild(confirmPasswordBtn);
-        passwordModal.appendChild(modalContent);
-        document.body.appendChild(passwordModal);
-
-        return({passwordModal, verifyPasswordInput, confirmPasswordBtn});
-    }
-
-    function showMainSettings(requirePasswordVerification = true) {
-        if (requirePasswordVerification) {
-            logData("password verification is required (displaying modal...)");
-            const { passwordModal, verifyPasswordInput, confirmPasswordBtn } = createModal();
-
-            confirmPasswordBtn.addEventListener("click", async () => {
-                logData("confirm password button has been pressed on modal!");
-                const passwordVerified = await verifyPassword(verifyPasswordInput.value);
-                if (passwordVerified) {
-                    passwordModal.remove();
-                    passwordSetup.style.display = "none";
-                    mainSettings.style.display = "block";
-                    logData("password is correct! displaying main settings...");
-                    loadTimeLimits();
-                }
-                else logData("password isn't correct! user maybe retry?");
-            });
+    if (currentPassword && newPassword) {
+        try {
+            const passwordVerified = await verifyPassword(currentPassword);
+            if (passwordVerified) {
+                const newHash = await hashPassword(newPassword);
+                await browser.storage.local.set({passwordHash: newHash});
+                currentPasswordInput.value = "";
+                newPasswordInput.value = "";
+                showNotify("Password successfully changed!", "This tab will close in 3 seconds.", false);
+                
+                setTimeout(() => {
+                    browser.tabs.getCurrent().then(tab => {
+                        browser.tabs.remove(tab.id);
+                    });
+                }, 3000);
+            }
+            else showNotify("Change password", "Current password is incorrect, please retry!", true);
         }
-        else {
-            logData("displaying main settings...");
-            passwordSetup.style.display = "none";
-            mainSettings.style.display = "block";
-            loadTimeLimits();
+        catch (error) {
+            showNotify("An error occurred", "Please try again.", true);
         }
     }
+    else showNotify("Change password", "Please complete all entries to change password", true);
+}
 
-    // ***************************************************************
-    //                          time limits management functions
-    // ***************************************************************
-    function loadTimeLimits() {
-        logData("loading time limits (loadTimeLimits has been called!)");
-        browser.storage.local.get("timeLimits").then(result => {
-            displayLimitsTable(result.timeLimits);
-        });
+// ***************************************************************
+//                          appearance functions
+// ***************************************************************
+let notificationTimeout;
+
+function showNotify(title, text, isError) {
+    if (notificationTimeout) {
+        clearTimeout(notificationTimeout);
+        notification.classList.remove("show");
     }
 
-    function displayLimitsTable(limits) {
-        const tableBody = document.querySelector("#time_limits_table tbody");
-        tableBody.innerHTML = "";
-        for (const [day, limite] of Object.entries(limits)) {
-            const row = document.createElement("tr");
-            const dayCell = document.createElement("td");
-            dayCell.textContent = day.charAt(0).toUpperCase() + day.slice(1);
-    
-            const limitCell = document.createElement("td");
-            const inputLimit = document.createElement("input");
-            inputLimit.type = "number";
-            inputLimit.id = `${day}_limit`;
-            inputLimit.min = 0;
-            inputLimit.max = 1440;
-            inputLimit.value = limite;
-            limitCell.appendChild(inputLimit);
-            row.appendChild(dayCell);
-            row.appendChild(limitCell);
-            tableBody.appendChild(row);
+    notification.classList.add("show");
+    document.getElementById("notif_title").textContent = title;
+    const notifyText = document.getElementById("notif_info");
+    notifyText.style.color = isError ? RED : GREEN;
+    notifyText.innerText = text;
+
+    notificationTimeout = setTimeout(() => {
+        notification.classList.remove("show");
+        notificationTimeout = null;
+    }, 4000);
+}
+
+function showModal() {
+    const passwordModal = document.createElement("div");
+    passwordModal.classList.add("password_modal");
+
+    const modalContent = document.createElement("div");
+    modalContent.classList.add("modal_content");
+
+    const title = document.createElement("h2");
+    title.className = "title";
+    title.textContent = "Password check";
+
+    const verifyPasswordInput = document.createElement("input");
+    verifyPasswordInput.type = "password";
+    verifyPasswordInput.id = "verify_password";
+    verifyPasswordInput.required = true;
+
+    const confirmPasswordBtn = document.createElement("button");
+    confirmPasswordBtn.className = "classic_button";
+    confirmPasswordBtn.id = "confirm_password";
+    confirmPasswordBtn.textContent = "Confirm";
+
+    modalContent.appendChild(title);
+    modalContent.appendChild(verifyPasswordInput);
+    modalContent.appendChild(confirmPasswordBtn);
+    passwordModal.appendChild(modalContent);
+    document.body.appendChild(passwordModal);
+
+    return({passwordModal, verifyPasswordInput, confirmPasswordBtn});
+}
+
+function showMainSettings(requirePasswordVerification = true) {
+    if (requirePasswordVerification) {
+        const { passwordModal, verifyPasswordInput, confirmPasswordBtn } = showModal();
+
+        async function checkPassword() {
+            const passwordVerified = await verifyPassword(verifyPasswordInput.value);
+            if (passwordVerified) {
+                showNotify("Your password is correct!", "Welcome to RepulsTime's settings!", false);
+                passwordModal.remove();
+                toggleVisibility(passwordSetup, false);
+                toggleVisibility(mainSettings, true);
+                loadTimeLimits();
+            }
+            else showNotify("Your password isn't correct!", "Please try again", true);
         }
-        logData("time limits have been displayed on table!");
+        
+        handleEnterKey(verifyPasswordInput, checkPassword);
+        confirmPasswordBtn.addEventListener("click", async () => {
+            await checkPassword();
+        });
     }
+    else {
+        toggleVisibility(passwordSetup, false);
+        toggleVisibility(mainSettings, true);
+        loadTimeLimits();
+    }
+}
 
-    async function saveLimits() {
-        const newLimits = {};
-        const inputs = document.querySelectorAll("#time_limits_table input");
-        inputs.forEach(input => {
-            const day = input.id.split("_")[0];
-            newLimits[day] = parseInt(input.value);
-        });
+// ***************************************************************
+//                          time limits management functions
+// ***************************************************************
+function loadTimeLimits() {
+    browser.storage.local.get("timeLimits").then(result => {
+        displayLimitsTable(result.timeLimits || {});
+    });
+}
 
-        browser.storage.local.set({timeLimits: newLimits}).then(() => {
-            changeTimeLimitsInfo.style.display = "block";
-            changeTimeLimitsInfo.style.color = GREEN;
-            changeTimeLimitsInfo.innerText = "Time limits have been successfully saved!";
-        });
+function displayLimitsTable(limits) {
+    const tableBody = document.querySelector("#time_limits_table tbody");
+    tableBody.innerHTML = "";
+    for (const [day, limite] of Object.entries(limits)) {
+        const row = document.createElement("tr");
+        const dayCell = document.createElement("td");
+        dayCell.textContent = day.charAt(0).toUpperCase() + day.slice(1);
 
+        const limitCell = document.createElement("td");
+        const inputLimit = document.createElement("input");
+        inputLimit.type = "number";
+        inputLimit.id = `${day}_limit`;
+        inputLimit.min = 0;
+        inputLimit.max = 1440;
+        inputLimit.value = limite;
+        limitCell.appendChild(inputLimit);
+        row.appendChild(dayCell);
+        row.appendChild(limitCell);
+        tableBody.appendChild(row);
+    }
+}
+
+async function saveLimits() {
+    const newLimits = {};
+    const inputs = document.querySelectorAll("#time_limits_table input");
+    inputs.forEach(input => {
+        const day = input.id.split("_")[0];
+        newLimits[day] = parseInt(input.value);
+    });
+
+    browser.storage.local.set({timeLimits: newLimits}).then(() => {
+        showNotify("Time limits changed", "Time limits have been successfully saved!", false);
         browser.runtime.sendMessage({action: "timeLimitsUpdated"});
-    }
+    });
+}
 
+document.addEventListener("DOMContentLoaded", function() {
     // ***************************************************************
-    //                          event section
+    //                          init and events section
     // ***************************************************************
     browser.storage.local.get("passwordHash").then(result => {
         if (result.passwordHash) showMainSettings(true);
-        else passwordSetup.style.display = "block";
+        else toggleVisibility(passwordSetup, true);
     });
 
     const saveLimitsBtn = document.getElementById("save_limits");
     saveLimitsBtn.addEventListener("click", saveLimits);
-    
-    const changePasswordBtn = document.getElementById("change_password");
-    changePasswordBtn.addEventListener("click", async () => {
-        logData("change password button has been pressed!");
-        const currentPassword = currentPasswordInput.value;
-        const newPassword = newPasswordInput.value;
 
-        if (currentPassword && newPassword) {
-            try {
-                const passwordVerified = await verifyPassword(currentPassword);
-                if (passwordVerified) {
-                    const newHash = await hashPassword(newPassword);
-                    await browser.storage.local.set({passwordHash: newHash});
-                    currentPasswordInput.value = "";
-                    newPasswordInput.value = "";
-                    displayChangePasswordInfo("Password successfully changed. This tab will close in 3 seconds.", GREEN);
-                    logData("password changed!");
-                    
-                    setTimeout(() => {
-                        browser.tabs.getCurrent().then(tab => {
-                            browser.tabs.remove(tab.id);
-                        });
-                    }, 3000);
-                }
-                else {
-                    displayChangePasswordInfo("Current password is incorrect, please retry", RED);
-                    logData("password isn't correct, user maybe retry!");
-                }
-            }
-            catch (error) {
-                if(DEBUG_PRINT) console.info("error changing password: " + error);
-                displayChangePasswordInfo("An error occurred. Please try again.", RED);
-            }
+    notification.addEventListener("click", () => {
+        if (notificationTimeout) {
+            clearTimeout(notificationTimeout);
+            notificationTimeout = null;
         }
-        else {
-            displayChangePasswordInfo("Please complete all entries to change password", RED);
-            logData("change password button pressed but not all entries have been completed!");
-        }
+        notification.classList.remove("show");
     });
 
-    const setInitialPasswordBtn = document.getElementById("set_initial_password");
+    // ***************************************************************
+    //                          initial password setup section
+    // ***************************************************************
     setInitialPasswordBtn.addEventListener("click", async () => {
-        const password = document.getElementById("initial_password").value;
-        if (password) {
-            const hash = await hashPassword(password);
-            browser.storage.local.set({passwordHash: hash}).then(() => {
-                showMainSettings(false);
-            });
-        }
+        setInitialPassword();
     });
+
+    handleEnterKey(initialPasswordInput, setInitialPassword);
+    
+    // ***************************************************************
+    //                          change password section
+    // ***************************************************************
+
+    changePasswordBtn.addEventListener("click", async () => {
+        await setNewPassword();
+    });
+
+    handleEnterKey(newPasswordInput, setNewPassword);
+    handleEnterKey(currentPasswordInput, setNewPassword);
 });
