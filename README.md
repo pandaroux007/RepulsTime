@@ -7,7 +7,6 @@
 
 ***Limit time spent on repuls.io***
 
-[![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/pandaroux007/RepulsTime)
 [![Licence](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/pandaroux007/RepulsTime/blob/main/LICENCE.txt)
 [![GitHub Release](https://img.shields.io/github/v/release/pandaroux007/RepulsTime?include_prereleases&style=flat&logo=auto&color=red&link=https%3A%2F%2Fgithub.com%2Fpandaroux007%2FRepulsTime%2Freleases)](https://github.com/pandaroux007/RepulsTime/releases)
 [![Commits](https://img.shields.io/github/commit-activity/t/pandaroux007/RepulsTime)](https://github.com/pandaroux007/RepulsTime/commits/main/)
@@ -22,6 +21,7 @@ Langages
 
 Available on
 
+[![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/pandaroux007/RepulsTime/releases)
 [![Firefox](https://img.shields.io/badge/Firefox-FF7139?logo=Firefox&logoColor=white&style=flat)](https://addons.mozilla.org/en-US/firefox/addon/repulstime/)
 
 </div>
