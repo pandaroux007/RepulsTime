@@ -17,7 +17,7 @@
         <h2 id="notif_title"></h2>
         <p id="notif_info"></p>
     </div>
-    <div class="settings_container">
+    <section class="settings_container">
         <img src="../icons/banner.svg" alt="RepulsTime">
         <h1 class="blue">RepulsTime's settings</h1>
         <!-- displayed once at first start-->
@@ -29,7 +29,7 @@
         </div>
         <!-- displayed after the user enters their password -->
         <main id="main_settings" style="display: none;">
-            <div class="box">
+            <section class="box">
                 <h2 class="blue">Maximum play time per day</h2>
                 <table id="time_limits_table">
                     <thead>
@@ -44,8 +44,8 @@
                 </table>
                 <p id="change_time_limits_info" style="display: none;"></p>
                 <button class="classic_button" id="save_limits">Save time limits</button>
-            </div>
-            <div class="danger_zone">
+            </section>
+            <section class="danger_zone">
                 <h2 class="red">Change password section</h2>
                 <div class="box">
                     <label for="current_password">Current password :</label>
@@ -57,9 +57,9 @@
                     <br>
                     <button class="danger_button" id="change_password_btn">Change password</button>
                 </div>
-            </div>
+            </section>
         </main>
-    </div>
+    </section>
     <script src="settings.js"></script>
 </body>
 </html>
