@@ -27,7 +27,7 @@ Available on
 </div>
 
 ## Licence
-This extension is licensed under the MIT license (see [LICENSE.txt](LICENCE.txt) file), for more information go to https://opensource.org/license/mit
+This extension is licensed under the MIT license (see [LICENSE.txt](LICENSE.txt) file), for more information go to https://opensource.org/license/mit
 
 ## State
 > [!IMPORTANT]
