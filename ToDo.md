@@ -9,3 +9,4 @@ ___
 - [ ] Add a way to activate/deactivate the time limit in the settings
 - [ ] **Must be done in partnership with the game to create an official API that is publicly accessible** ➜ Add display of leaderboard and game information (in-game statistics)
 - [ ] **Subject to further consideration...** ➜ Addition of in-game photo/video capture functionality
+- [ ] **Potentially impossible, something to think about** ➜ Adding a "test" and score function for performance, a sort of benchmark.
